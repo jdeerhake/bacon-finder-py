@@ -10,3 +10,6 @@ class Movie:
 
   def actors(self):
     return [perf.actor for perf in self.performances]
+
+  def has_actor(self, actor):
+    return actor in self.actors()

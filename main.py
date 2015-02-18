@@ -22,18 +22,34 @@ def get_performances(movies, actors):
   map(lambda perf: perf.movie.add_performance(perf), perfs)
   return perfs
 
+def show_path(start, end):
+  path = start.bfs_path(end)
+  if path is None:
+    print 'No connection between ' + start.name + ' and ' + end.name + '\n'
+    return
+  last = path.pop(0)
+  output = last.name + '\n'
+  for current in path:
+    movie = current.worked_with_in(last)
+    output += '  appeared in ' + movie.name + ' with\n' + current.name + '\n'
+    last = current
+  print output
+
+def get_input():
+  f = raw_input('First actor: ')
+  s = raw_input('Second actor: ')
+  print
+  show_path(actors_by_name[f], actors_by_name[s])
+
 movies = get_movies()
 actors = get_actors()
+actors_by_name = dict([(actor.name, actor) for actor in actors.values()])
 performances = get_performances(movies, actors)
 
+for actor in actors.values():
+  kevin = actors_by_name['Kevin Bacon']
+  path = actor.bfs_path(kevin)
+  print actor.name + ': ' + str(len(path)) if path != None else 'no path'
 
-start = actors[4]
-end = actors[63]
-
-
-print start.worked_with(end)
-
-# outut = start.name + ' costarred with '
-# if start in end.costars():
-#   output += end.name
-# else
+# while 1:
+#   get_input()
