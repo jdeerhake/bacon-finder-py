@@ -20,7 +20,10 @@ class Actor:
   def worked_with_in(self, actor):
     return next(movie for movie in self.movies() if movie.has_actor(actor))
 
-  def tree(self):
+  def find_link(self, actor):
+    return self.__bfs_path(actor)
+
+  def __tree(self):
     seen = set()
     tree = dict()
     queue = [self]
@@ -34,10 +37,10 @@ class Actor:
         queue.extend(tree[actor])
     return tree
 
-  def bfs_path(self, goal):
+  def __bfs_path(self, goal):
     if self == goal:
       return [self]
-    graph = self.tree()
+    graph = self.__tree()
     queue = [(self, [self])]
     while queue:
       (vertex, path) = queue.pop(0)

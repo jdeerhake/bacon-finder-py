@@ -3,7 +3,7 @@ import data
 
 def get_path_desc(start, end):
   print str(start.id) + " " + str(end.id)
-  path = start.bfs_path(end)
+  path = start.find_link(end)
   if path is None:
     return 'No connection between ' + start.name + ' and ' + end.name + '\n'
   last = path.pop(0)
@@ -15,7 +15,7 @@ def get_path_desc(start, end):
   return output
 
 def get_separation_num(start, end):
-  path = start.bfs_path(end)
+  path = start.find_link(end)
   if path is None:
     return path
   else:
