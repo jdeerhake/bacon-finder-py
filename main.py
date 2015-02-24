@@ -55,6 +55,12 @@ def benchmark(type):
       [get_separation_num(actor1, actor2) for n in range(9)]
       [get_separation_num(actor2, actor1) for n in range(9)]
 
+def get_all_separation(base_actor):
+  print "separations for " + base_actor.name
+  for actor in actors.values():
+    sep = get_separation_num(actor, base_actor)
+    print "\"" + actor.name + "\",\"" + str(sep) + "\""
+
 
 movies = data.get_movies()
 actors = data.get_actors()
@@ -64,6 +70,9 @@ performances = data.get_performances(movies, actors)
 
 if sys.argv[1] == "benchmark":
   benchmark("short")
+elif sys.argv[1] == "get_all":
+  id = int(sys.argv[2])
+  get_all_separation(actors[id])
 else:
   while 1:
     get_input()
