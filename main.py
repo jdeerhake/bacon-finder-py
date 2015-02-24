@@ -1,55 +1,60 @@
-from actor import Actor
-from movie import Movie
-from performance import Performance
+import sys
+import data
 
-def format_data(str):
-  return str.rstrip().split('|')
-
-def get_actors():
-  actor_data = map(format_data, open('data/actors.txt', 'r').readlines())
-  actors = map(lambda data: Actor(data[0], data[1]), actor_data)
-  return dict([(actor.id, actor) for actor in actors])
-
-def get_movies():
-  movie_data = map(format_data, open('data/movies.txt', 'r').readlines())
-  movies = map(lambda data: Movie(data[0], data[1]), movie_data)
-  return dict([(movie.id, movie) for movie in movies])
-
-def get_performances(movies, actors):
-  perf_data = map(format_data, open('data/movie-actors.txt', 'r').readlines())
-  perfs = map(lambda data: Performance(movies[int(data[0])], actors[int(data[1])]), perf_data)
-  map(lambda perf: perf.actor.add_performance(perf), perfs)
-  map(lambda perf: perf.movie.add_performance(perf), perfs)
-  return perfs
-
-def show_path(start, end):
+def get_path_desc(start, end):
   path = start.bfs_path(end)
   if path is None:
-    print 'No connection between ' + start.name + ' and ' + end.name + '\n'
-    return
+    return 'No connection between ' + start.name + ' and ' + end.name + '\n'
   last = path.pop(0)
   output = last.name + '\n'
   for current in path:
     movie = current.worked_with_in(last)
     output += '  appeared in ' + movie.name + ' with\n' + current.name + '\n'
     last = current
-  print output
+  return output
+
+def get_separation_num(start, end):
+  path = start.bfs_path(end)
+  if path is None:
+    return path
+  else:
+    return len(path) - 1
 
 def get_input():
   f = raw_input('First actor: ')
   s = raw_input('Second actor: ')
   print
-  show_path(actors_by_name[f], actors_by_name[s])
+  print get_path_desc(actors_by_name[f], actors_by_name[s])
 
-movies = get_movies()
-actors = get_actors()
+def benchmark(type):
+  tests = list([
+               [593, 11532, 2],
+               [63, 4792, 8],
+               [63, 63, 0],
+               [63, 11486, 7],
+               [63, 515, None]
+               ])
+
+  for params in tests:
+    actor1 = actors[params[0]]
+    actor2 = actors[params[1]]
+    expected_separation = params[2]
+    fwd_separation = get_separation_num(actor1, actor2);
+    rev_separation = get_separation_num(actor2, actor1);
+    if fwd_separation != expected_separation:
+      raise Exception("Expected " + actor1.name + " and " + actor2.name + " to have " + str(expected_separation) + " degrees of separation. Got: " + str(fwd_separation))
+    elif rev_separation != expected_separation:
+      raise Exception("Expected " + actor2.name + " and " + actor1.name + " to have " + str(expected_separation) + " degrees of separation. Got " + str(fwd_separation))
+
+
+movies = data.get_movies()
+actors = data.get_actors()
 actors_by_name = dict([(actor.name, actor) for actor in actors.values()])
-performances = get_performances(movies, actors)
+performances = data.get_performances(movies, actors)
 
-for actor in actors.values():
-  kevin = actors_by_name['Kevin Bacon']
-  path = actor.bfs_path(kevin)
-  print actor.name + ': ' + str(len(path)) if path != None else 'no path'
 
-# while 1:
-#   get_input()
+if sys.argv[1] == "benchmark":
+  benchmark("short")
+else:
+  while 1:
+    get_input()

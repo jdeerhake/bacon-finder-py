@@ -26,9 +26,11 @@ class Actor:
     queue = [self]
     while queue:
       actor = queue.pop(0)
-      if actor not in seen:
+      if actor not in tree:
         seen.add(actor)
-        tree[actor] = actor.costars() - seen
+        unseen_actors = actor.costars() - seen
+        tree[actor] = unseen_actors
+        seen.update(unseen_actors)
         queue.extend(tree[actor])
     return tree
 
