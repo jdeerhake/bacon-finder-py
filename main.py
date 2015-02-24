@@ -2,6 +2,7 @@ import sys
 import data
 
 def get_path_desc(start, end):
+  print str(start.id) + " " + str(end.id)
   path = start.bfs_path(end)
   if path is None:
     return 'No connection between ' + start.name + ' and ' + end.name + '\n'
@@ -32,7 +33,12 @@ def benchmark(type):
                [63, 4792, 8],
                [63, 63, 0],
                [63, 11486, 7],
-               [63, 515, None]
+               [63, 515, None],
+               [7060, 4251, 10],
+               [6205, 9029, 7],
+               [647, 6205, 4],
+               [408, 407, 1],
+               [143, 10744, 5]
                ])
 
   for params in tests:
@@ -45,6 +51,9 @@ def benchmark(type):
       raise Exception("Expected " + actor1.name + " and " + actor2.name + " to have " + str(expected_separation) + " degrees of separation. Got: " + str(fwd_separation))
     elif rev_separation != expected_separation:
       raise Exception("Expected " + actor2.name + " and " + actor1.name + " to have " + str(expected_separation) + " degrees of separation. Got " + str(fwd_separation))
+    else:
+      [get_separation_num(actor1, actor2) for n in range(9)]
+      [get_separation_num(actor2, actor1) for n in range(9)]
 
 
 movies = data.get_movies()
