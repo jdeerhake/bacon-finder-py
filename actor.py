@@ -21,31 +21,35 @@ class Actor:
     return next(movie for movie in self.movies() if movie.has_actor(actor))
 
   def find_link(self, actor):
-    return self.__bfs_path(actor)
+    return self.__tree_paths(actor)
 
-  def __tree(self):
-    seen = set()
-    tree = dict()
-    queue = [self]
-    while queue:
-      actor = queue.pop(0)
-      if actor not in tree:
-        seen.add(actor)
-        unseen_actors = actor.costars() - seen
-        tree[actor] = unseen_actors
-        seen.update(unseen_actors)
-        queue.extend(tree[actor])
-    return tree
+  def tree_stats(self):
+    paths = self.__tree_paths(None)
+    paths_lens = sorted([len(path) for path in paths])
+    return {
+      'total_nodes' : len(paths),
+      'longest_path' : paths_lens[-1],
+      'average_path' : round(sum(paths_lens) / float(len(paths_lens)), 3)
+    }
 
-  def __bfs_path(self, goal):
+  def __tree_paths(self, goal):
     if self == goal:
       return [self]
-    graph = self.__tree()
-    queue = [(self, [self])]
+    seen = set([self])
+    queue = [[self]]
+    saved_paths = [[self]]
     while queue:
-      (vertex, path) = queue.pop(0)
-      for next in graph[vertex] - set(path):
-        if next == goal:
-          return path + [next]
-        else:
-          queue.append((next, path + [next]))
+      path = queue.pop(0)
+      actor = path[-1]
+      unseen_actors = actor.costars() - seen
+      if goal in unseen_actors:
+        return path + [goal]
+      seen.update(unseen_actors)
+      paths = [path + [a] for a in unseen_actors]
+      if goal is None:
+        saved_paths.extend(paths)
+      queue.extend(paths)
+    if goal is None:
+      return saved_paths
+    else:
+      return None
